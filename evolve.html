@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Evolution Cinematic</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+      url("background.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+  }
+
+  /* Navbar */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(0, 0, 0, 0);
+    z-index: 1000;
+    transition: transform 0.35s ease, top 0.35s ease;
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  .nav-inner{
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #fff;
+  }
+  nav.hidden { transform: translateY(-100%); }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 8px 10px;
+    border-radius: 6px;
+    transition: background .18s, color .18s;
+  }
+  nav ul li a:hover { background: rgba(255,255,255,0.03); color: #ff2b2b; }
+
+  .hero, .evolution-section, #video, #explore { scroll-margin-top: 90px; }
+
+  /* Hero */
+  .hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-left: 80px;
+    text-align: left;
+  }
+  .hero h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4rem;
+    margin-bottom: 30px;
+  }
+
+  /* Fancy Button */
+  .cssbuttons-io-button {
+    background: #820f0f;
+    color: white;
+    padding: 0.35em 1.2em;
+    font-size: 17px;
+    border-radius: 0.9em;
+    border: none;
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 2.8em;
+    padding-right: 3.3em;
+    cursor: pointer;
+    box-shadow: inset 0 0 1.6em -0.6em #760d0d;
+  }
+  .cssbuttons-io-button .icon {
+    background: rgb(26, 26, 26);
+    margin-left: 1em;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.2em;
+    width: 2.2em;
+    border-radius: 0.7em;
+    box-shadow: 0.1em 0.1em 0.6em 0.2em #6c0b0b;
+    right: 0.3em;
+    transition: all 0.3s;
+  }
+  .cssbuttons-io-button:hover .icon { width: calc(100% - 0.6em); }
+
+  /* Evolution Section */
+  .evolution-section {
+    min-height: 300vh;
+    padding: 150px 50px;
+  }
+  .evolution-section h2 {
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 100px;
+    color: #ffffffb5;
+  }
+
+  /* Car Panels */
+  .car-panel {
+    position: relative;
+    margin: 200px 0;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 1s ease;
+    cursor: pointer;
+  }
+  .car-panel.visible { opacity: 1; transform: translateY(0); }
+  .car-panel img {
+    width: 70%;
+    max-width: 900px;
+    border-radius: 10px;
+    filter: grayscale(100%);
+    transition: all 0.8s ease;
+  }
+  .car-panel:hover img { transform: scale(0.95); filter: grayscale(0%); }
+
+  .car-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    padding: 15px 25px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .car-panel:hover .car-overlay { opacity: 1; }
+
+  /* Modal */
+  .description-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    font-size: 1.2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 10000;
+  }
+  .description-modal.active { opacity: 1; pointer-events: all; }
+  .description-modal-content { max-width: 800px; }
+  .description-modal h3 { font-size: 2.5rem; margin-bottom: 25px; color: #8e0702; }
+  .close-btn {
+    position: absolute; top: 20px; right: 40px;
+    font-size: 2.5rem; cursor: pointer; color: #740400;
+  }
+
+  /* Fun Fact Highlight */
+  .fun-fact {
+    display: block;
+    margin-top: 15px;
+    padding: 12px 18px;
+    background: #111;
+    border-left: 4px solid #b00000;
+    border-radius: 6px;
+    font-style: italic;
+    color: #ff9999;
+  }
+
+  @media (max-width:800px){
+    .hero h1 { font-size: 2.5rem; padding-right: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="logo">F1 Evolution</div>
+    <ul>
+      <li><a href="home.html">Home</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="about-us-f1.html">About Us</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <h1>Experience the Evolution of Formula 1</h1>
+    <button class="cssbuttons-io-button" id="exploreBtn">
+      Explore
+      <div class="icon">
+        <svg height="24" width="24" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </button>
+  </div>
+</section>
+
+<section id="video" style="height:1px; visibility:hidden;"></section>
+<section id="explore" style="height:1px; visibility:hidden;"></section>
+
+<section class="evolution-section" id="evolution">
+  <h2>Car Evolution Through the Years</h2>
+
+  <div class="car-panel" data-title="F1 1950s" data-desc="This was the dawn of legends. Cars of the 1950s were rolling bullets, stripped to their essence: raw aluminum skins stretched over roaring engines, built more like fighter planes than automobiles. They glistened under the sun like medieval armor, built for knights of speed who gripped thin steering wheels with nothing but guts and grit. No safety, no wings, no second chances, just courage measured in revolutions per minute.
+Fun Fact: This era’s cars were nicknamed Silver Arrows because they were stripped to bare aluminum to save weight fast fashion, literally. When these beasts screamed down the straights, they weren’t just racing; they were rewriting physics on four wheels.">
+    <img src="f1-1950.jpg" alt="F1 1950">
+    <div class="car-overlay">The Classic Thunder Era (1950s)</div>
+  </div>
+
+    <div class="car-panel" data-title="F1 1960s" data-desc="A new age had dawned. The 1960s saw machines transform from brute force into sleek weapons of precision. Narrow, low slung, and deadlier than ever, these cars turned the racetrack into a knife fight at impossible speeds. With engines move behind the driver, the balance shifted. Formula 1 became sharper, faster, and far more dangerous. Drivers wore thin helmets and thinner hopes, dueling wheel to wheel at 150 miles per hour with nothing but courage to protect them.
+    Fun Fact: The Lotus 18 gave Stirling Moss one of his most famous victories at Monaco in 1961, proving that clever engineering could slay giants. It was David versus Goliath, except David’s slingshot had a 5-speed gearbox.">
+    <img src="f1-1960.png" alt="F1 1960">
+    <div class="car-overlay"> The Precision Spear Era (1960s)</div>
+  </div>
+
+  <div class="car-panel" data-title="F1 1970s" data-desc="The 1970s were Formula 1 unleashed. Cars grew wings, sprouting aero like wild beasts desperate to grip the earth. They were low, wide, and vicious half fighter jet, half death trap. Every race was a gamble between glory and disaster, where brilliance in design could win a championship or end in smoke and silence. Drivers were gladiators, strapped into rockets that tested not just speed, but survival itself.
+
+Fun Fact: In this decade, teams discovered the magic of aerodynamic downforce. At first, wings were bolted on with little more than guesswork, some even collapsed mid race. Out of this danger was born the modern science of F1 aerodynamics.">
+    <img src="f1-1970.jpg" alt="F1 1970">
+    <div class="car-overlay">The Firestorm Era (1970s)</div>
+  </div>
+
+  <div class="car-panel" data-title="F1 1990s" data-desc="The 1990s were the age of giants. Cars became muscular, wide shouldered beasts with towering rear wings and screaming engines that could shatter eardrums. It was raw power fused with the first sparks of real technology, traction control, semi automatic gearboxes, and the dawn of computer brains inside mechanical monsters. The battles were fierce, the rivalries legendary, and the sound? Pure thunder.
+
+Fun Fact: V10 engines of this era revved so high and screamed so loud, they could be heard miles from the racetrack like a symphony of mechanical fury">
+    <img src="f1-1990.jpg" alt="F1 1990">
+    <div class="car-overlay">The Titan Era (1990s)</div>
+  </div>
+
+  <div class="car-panel" data-title="F1 2010s" data-desc="The 2010s were ruled by precision and science. Aerodynamics became the sword and shield of Formula 1, wings, fins, and complex airflow sculpted every millimeter. These cars looked like fighter jets with wheels, engineered to perfection by armies of wind tunnel warriors. Speed was no longer just about horsepower; it was about air itself. Every curve, every flick of the wing decided victory.
+
+Fun Fact: In this era, cars generated so much downforce that, in theory, they could drive upside down on the ceiling of a tunnel and still stick.">
+    <img src="f1-2010.jpg" alt="F1 2010">
+    <div class="car-overlay">The Hybrid Era (2010)</div>
+  </div>
+
+  <div class="car-panel" data-title="F1 2025" data-desc="Welcome to the future. Formula 1 is now a battleground of brains, batteries, and brute force. Hybrids roar with both electric precision and combustion fury, delivering more power than ever before while sipping fuel like never before. The cars are monsters of data, monitored in real time by supercomputers, yet still wrestled by human hands at 200 mph. It is the perfect storm of man and machine, where sustainability meets savagery.
+
+Fun Fact: Modern F1 cars recover energy under braking and store it to unleash like a turbo boost, turning every lap into a video game, except at life threatening speed.">
+    <img src="f1-2023.avif" alt="F1 2025">
+    <div class="car-overlay">Modern F1 (2025)</div>
+  </div>
+</section>
+
+<div class="description-modal" id="modal">
+  <div class="close-btn" id="closeBtn">&times;</div>
+  <div class="description-modal-content">
+    <h3 id="modalTitle">Title</h3>
+    <p id="modalDesc">Description</p>
+  </div>
+</div>
+
+<script>
+  // Navbar hide
+  let lastScroll = 0;
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    if (currentScroll > lastScroll) navbar.classList.add("hidden");
+    else navbar.classList.remove("hidden");
+    lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+  });
+
+  // Explore scroll
+  document.getElementById("exploreBtn").addEventListener("click", () => {
+    document.getElementById("evolution").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Modal
+  const carPanels = document.querySelectorAll('.car-panel');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc = document.getElementById('modalDesc');
+
+  carPanels.forEach(panel => {
+    panel.addEventListener('click', () => {
+      modal.classList.add('active');
+      modalTitle.textContent = panel.dataset.title;
+
+      // Split Fun Fact
+      let desc = panel.dataset.desc;
+      if (desc.includes("Fun Fact:")) {
+        let [normal, fun] = desc.split("Fun Fact:");
+        modalDesc.innerHTML = normal + '<span class="fun-fact">Fun Fact:' + fun + '</span>';
+      } else {
+        modalDesc.textContent = desc;
+      }
+    });
+  });
+
+  // Close modal
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.id === "closeBtn") {
+      modal.classList.remove('active');
+    }
+  });
+
+  // Reveal animations
+  window.addEventListener('scroll', () => {
+    carPanels.forEach(panel => {
+      const rect = panel.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85) {
+        panel.classList.add('visible');
+      }
+    });
+  });
+  window.dispatchEvent(new Event('scroll'));
+</script>
+</body>
+</html>
